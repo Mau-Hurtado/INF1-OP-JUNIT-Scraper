@@ -32,10 +32,12 @@ public class Scraper {
 	public static void main(String args[]){
 		String url = "http://www.inf.ed.ac.uk/teaching/courses/inf1/op/2019/labs/unittests.html";
 		String suffix = "Test.java";
+		String folderName = "JUNIT Tests";
 		
-		print("Download 2019 JUNIT lab tests to \"/JUNIT tests\"?"
+		print("Download 2019 JUNIT lab tests to \"/%s\"?"
 				+ "\n1: Download now" 
-				+ "\n2: Exit");
+				+ "\n2: Exit"
+				,folderName);
 		int userInput = parseInput();
 		switch (userInput) {
 		case 1:
@@ -45,11 +47,11 @@ public class Scraper {
 		}
 		
 		print("Connecting...");
-		downloadFilesEndingIn(suffix, url);
+		downloadFilesEndingIn(suffix, url, folderName);
 		print("Finished.\nDownloaded %s files ending in " + suffix, numberDownloaded);
 	}
 	
-	public static void downloadFilesEndingIn(String suffix, String url) {
+	public static void downloadFilesEndingIn(String suffix, String url, String folderName) {
 		try {
 			Document doc;
 			try {
@@ -72,16 +74,16 @@ public class Scraper {
 
 					String[] parts = link.split("/");
 					
-					String folder = "unknown";
+					String subFolder = "unknown";
 					for (int i = 0; i < parts.length-1; i++) {
 						if (parts[i].endsWith("unittests"))
 						{
-							folder = parts[i+1];
+							subFolder = parts[i+1];
 							break;
 						}
 					}
-					print("Downloading %s to /%s",parts[parts.length-1],folder);
-					downloadFile(link, parts[parts.length-1], folder);
+					print("Downloading %s to /%s",parts[parts.length-1],subFolder);
+					downloadFile(link, parts[parts.length-1], folderName + "/" + subFolder);
 					numberDownloaded++;
 				}
 			}
@@ -98,7 +100,7 @@ public class Scraper {
 			
 		website = new URL(urlString);
 		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-		new File("JUNIT tests/" + folder).mkdirs();
+		new File(folder).mkdirs();
 		FileOutputStream fos = new FileOutputStream(folder + "/" + filename);
 		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 		
